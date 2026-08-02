@@ -53,3 +53,7 @@ Run both at the same time — the frontend proxies `/api/*` requests to the back
 
 - CORS on the backend is intentionally open (`allow_origins=["*"]`) for local/portfolio use.
 - `python-jobspy` has no native concept of "hybrid" work arrangements, so hybrid/onsite classification is done locally via keyword matching on each listing.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
