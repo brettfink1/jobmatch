@@ -82,9 +82,7 @@ export default function JobCard({ job }: JobCardProps) {
       ? job.description.slice(0, 150).trimEnd() + "..."
       : job.description;
 
-  const hasSalary =
-    job.salary_min !== undefined ||
-    job.salary_max !== undefined;
+  const hasSalary = job.salary_min != null || job.salary_max != null;
 
   const formatSalary = (val: number) => {
     if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`;

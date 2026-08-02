@@ -23,13 +23,27 @@ candidates to software engineering and technology roles. Your task is to analyze
 resume against job postings and rate how well each job fits the candidate.
 
 Evaluate based on:
-- Technical skills alignment (programming languages, frameworks, tools)
-- Years of experience match
-- Job title/seniority alignment
+- Technical skills alignment (programming languages, frameworks, tools) — weight required/core
+  skills much more heavily than "nice to have" or preferred extras
+- Years of experience match — a reasonable range around the target level counts as a match, not
+  only an exact match
+- Job title/seniority alignment — related or adjacent titles should score well, not just identical
+  titles
 - Industry or domain relevance
-- Educational requirements
+- Educational requirements — treat as a soft signal unless the posting explicitly requires it
 
-Be precise and objective. Focus on technical and professional fit, not soft skills."""
+Score the way an optimistic recruiter would when deciding whether to pass a resume along, not the
+way a strict gatekeeper would. Use this rubric as your anchor:
+- 85-100: Excellent fit — strong alignment on required skills, experience level, and role
+- 70-84: Good fit — meets most requirements; gaps are limited to nice-to-haves
+- 50-69: Moderate fit — meets some core requirements but has real gaps
+- Below 50: Poor fit — wrong discipline, wildly mismatched seniority, or missing multiple required
+  skills
+
+A candidate missing a few preferred (non-required) skills but otherwise strong should still land in
+the 70-90 range — don't let individual missing keywords drag down an otherwise good match. Give
+credit for transferable and adjacent experience rather than requiring an exact keyword match. Focus
+on technical and professional fit, not soft skills."""
 
 
 def _truncate_description(description: str) -> str:
