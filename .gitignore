@@ -16,6 +16,7 @@ frontend/.next/
 frontend/out/
 frontend/npm-debug.log*
 frontend/*.tsbuildinfo
+frontend/next-env.d.ts
 
 # Editor / OS
 .DS_Store
