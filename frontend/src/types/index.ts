@@ -31,6 +31,7 @@ export interface JobMatch {
   description: string;
   url: string;
   source: string;
+  work_arrangement: WorkArrangement;
   date_posted?: string;
   salary_min?: number;
   salary_max?: number;

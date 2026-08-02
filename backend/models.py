@@ -31,6 +31,7 @@ class JobMatch(BaseModel):
     description: str
     url: str
     source: str
+    work_arrangement: str
     date_posted: Optional[str] = None
     salary_min: Optional[float] = None
     salary_max: Optional[float] = None

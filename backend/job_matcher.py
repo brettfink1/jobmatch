@@ -12,8 +12,18 @@ from models import JobMatch
 
 logger = logging.getLogger(__name__)
 
-# Number of jobs to send per Claude API call
-BATCH_SIZE = 5
+# Number of jobs to send per Claude API call. Larger batches mean fewer calls,
+# which amortizes the repeated system-prompt/resume overhead across more jobs.
+BATCH_SIZE = 10
+
+# Output budget per batch call. Each job needs ~150-200 tokens for its score,
+# reasons, and missing skills, so this scales with BATCH_SIZE.
+MAX_OUTPUT_TOKENS = 4096
+
+# Model used for job scoring. Haiku 4.5 is ~3x cheaper than Sonnet 4.6 on both
+# input and output for this kind of structured classification task. Override
+# via env var to A/B against a different model without a code change.
+MATCHING_MODEL = os.getenv("JOB_MATCHING_MODEL", "claude-haiku-4-5")
 
 # Truncate job descriptions to keep token usage manageable
 MAX_DESCRIPTION_CHARS = 2000
@@ -137,8 +147,8 @@ def _score_batch(client: anthropic.Anthropic, resume_text: str, jobs_batch: List
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2048,
+            model=MATCHING_MODEL,
+            max_tokens=MAX_OUTPUT_TOKENS,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -195,6 +205,7 @@ def _score_batch(client: anthropic.Anthropic, resume_text: str, jobs_batch: List
             description=str(job.get("description") or "")[:5000],
             url=str(job.get("url") or ""),
             source=str(job.get("source") or ""),
+            work_arrangement=str(job.get("arrangement") or "onsite"),
             date_posted=str(job.get("date_posted")) if job.get("date_posted") else None,
             salary_min=salary_min,
             salary_max=salary_max,
@@ -266,6 +277,7 @@ def match_jobs(resume_text: str, jobs: List[dict]) -> List[JobMatch]:
                             description=str(job.get("description") or "")[:5000],
                             url=str(job.get("url") or ""),
                             source=str(job.get("source") or ""),
+                            work_arrangement=str(job.get("arrangement") or "onsite"),
                             date_posted=str(job.get("date_posted")) if job.get("date_posted") else None,
                             salary_min=None,
                             salary_max=None,

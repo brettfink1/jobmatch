@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { JobMatch } from "@/types";
+import { JobMatch, WorkArrangement } from "@/types";
 import JobCard from "./JobCard";
 
 interface JobResultsProps {
@@ -12,11 +12,31 @@ interface JobResultsProps {
 
 type SortOption = "score" | "date" | "salary";
 
+const ARRANGEMENT_FILTER_OPTIONS: { value: WorkArrangement; label: string }[] = [
+  { value: "remote", label: "Remote" },
+  { value: "hybrid", label: "Hybrid" },
+  { value: "onsite", label: "On-site" },
+];
+
 export default function JobResults({ jobs, totalFound, onReset }: JobResultsProps) {
   const [sortBy, setSortBy] = useState<SortOption>("score");
   const [filterScore, setFilterScore] = useState(0);
+  const [filterArrangements, setFilterArrangements] = useState<WorkArrangement[]>([]);
 
-  const filtered = jobs.filter((j) => j.match_score >= filterScore);
+  const toggleArrangementFilter = (value: WorkArrangement) => {
+    setFilterArrangements((current) =>
+      current.includes(value)
+        ? current.filter((a) => a !== value)
+        : [...current, value]
+    );
+  };
+
+  const filtered = jobs.filter(
+    (j) =>
+      j.match_score >= filterScore &&
+      (filterArrangements.length === 0 ||
+        filterArrangements.includes(j.work_arrangement))
+  );
 
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "score") return b.match_score - a.match_score;
@@ -118,6 +138,28 @@ export default function JobResults({ jobs, totalFound, onReset }: JobResultsProp
           </span>
         </div>
 
+        <div className="flex items-center gap-2 bg-slate-800/60 border border-slate-700 rounded-xl px-3 py-2">
+          <span className="text-xs text-slate-400 whitespace-nowrap">Arrangement:</span>
+          {ARRANGEMENT_FILTER_OPTIONS.map(({ value, label }) => {
+            const isSelected = filterArrangements.includes(value);
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => toggleArrangementFilter(value)}
+                aria-pressed={isSelected}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                  isSelected
+                    ? "bg-indigo-500/20 border border-indigo-500/60 text-indigo-300"
+                    : "border border-transparent text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
         <button
           onClick={onReset}
           className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-600 text-slate-400 hover:text-slate-200 hover:border-slate-500 text-xs font-medium transition-all"
@@ -152,7 +194,10 @@ export default function JobResults({ jobs, totalFound, onReset }: JobResultsProp
           <p className="text-lg font-semibold text-slate-300">No results match your filters</p>
           <p className="text-sm mt-1">Try lowering the minimum score filter</p>
           <button
-            onClick={() => setFilterScore(0)}
+            onClick={() => {
+              setFilterScore(0);
+              setFilterArrangements([]);
+            }}
             className="mt-4 text-indigo-400 hover:text-indigo-300 text-sm underline underline-offset-2"
           >
             Clear filters

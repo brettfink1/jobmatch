@@ -124,6 +124,13 @@ export default function JobCard({ job }: JobCardProps) {
                 {job.location}
               </div>
 
+              <span className="text-slate-400 text-xs">
+                {job.work_arrangement === "onsite"
+                  ? "On-site"
+                  : job.work_arrangement.charAt(0).toUpperCase() +
+                    job.work_arrangement.slice(1)}
+              </span>
+
               {hasSalary && (
                 <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
